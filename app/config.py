@@ -23,6 +23,11 @@ class Settings(BaseSettings):
 
     model_config = _settings
 
+class JWTSettings(BaseSettings):
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+
+    model_config = _settings
+
 settings = Settings()
-
-
+jwt_settings = JWTSettings()

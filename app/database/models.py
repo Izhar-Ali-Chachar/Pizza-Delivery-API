@@ -1,8 +1,12 @@
 from enum import Enum
+
 from pydantic import EmailStr
+
 from sqlalchemy.dialects import postgresql as PostgreSQL
 from sqlmodel import Field, Relationship, SQLModel, Column
+
 from uuid import UUID, uuid4
+
 from typing import List, Optional
 
 class User(SQLModel, table=True):
