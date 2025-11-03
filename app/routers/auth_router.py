@@ -5,7 +5,7 @@ import jwt
 
 from sqlmodel import select
 
-from ..database.session import sessionDep
+from ..dependencies import sessionDep
 from ..database.models import User
 
 from ..schemas.user import UserCreate
