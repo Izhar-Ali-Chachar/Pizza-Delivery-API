@@ -14,6 +14,8 @@ class OrderCreate(OrderBase):
 
 class OrderRead(OrderBase):
     id: UUID
+    user_id: UUID
+    order_status: OrderStatus
 
 class OrderUpdate(BaseModel):
     name: str | None = None
