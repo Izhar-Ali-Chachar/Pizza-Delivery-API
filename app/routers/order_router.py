@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 
 from sqlmodel import select
 
@@ -23,7 +23,7 @@ async def get_orders(session: sessionDep, current_user: adminDep):
     orders = result.scalars().all()
     return orders
 
-@order_router.get('/{id}')
+@order_router.get('/{id}', response_model=OrderRead)
 async def get_order_by_id(id: UUID, session: sessionDep):
     """
     Get order by ID
@@ -31,7 +31,10 @@ async def get_order_by_id(id: UUID, session: sessionDep):
     result = await session.execute(select(Order).where(Order.id == id))
     order = result.scalar()
     if order is None:
-        return {"error": "Order not found"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Order not found"
+        )
     return order
 
 @order_router.post("/create", response_model=OrderRead)
@@ -54,7 +57,10 @@ async def update_order_status(id: UUID, order: OrderUpdate, session: sessionDep)
     result = await session.execute(select(Order).where(Order.id == id))
     db_order = result.scalar()
     if db_order is None:
-        return {"error": "Order not found"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Order not found"
+        )
     order_data = order.model_dump(exclude_unset=True)
     
     db_order.sqlmodel_update(order_data)
@@ -62,3 +68,19 @@ async def update_order_status(id: UUID, order: OrderUpdate, session: sessionDep)
     await session.commit()
     await session.refresh(db_order)
     return db_order
+
+@order_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_order(id: UUID, session: sessionDep, current_user: adminDep):
+    """
+    Delete order by ID (admin use)
+    """
+    result = await session.execute(select(Order).where(Order.id == id))
+    db_order = result.scalar()
+    if db_order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Order not found"
+        )
+    await session.delete(db_order)
+    await session.commit()
+    return None
