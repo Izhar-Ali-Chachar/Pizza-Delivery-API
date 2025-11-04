@@ -24,8 +24,7 @@ auth_router = APIRouter(
 @auth_router.post("/sign-up")
 async def sign_up(user_create: UserCreate, session: sessionDep):
     new_user = User(
-        name=user_create.name,
-        email=user_create.email,
+        **user_create.model_dump(exclude=("password",)),
         hashed_password=pwd_context.hash(user_create.password)  # In a real app, hash the password!
     )
     session.add(new_user)

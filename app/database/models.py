@@ -52,8 +52,34 @@ class Order(SQLModel, table=True):
     order_status: OrderStatus = Field(default=OrderStatus.PENDING)
     pizza_size: PizzaSize = Field(default=PizzaSize.MEDIUM)
 
-    user_id: UUID = Field(foreign_key="user.id")
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    driver_id: Optional[UUID] = Field(foreign_key="driver.id", index=True, nullable=True)
+
     user: Optional[User] = Relationship(
         back_populates="orders",
+        sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+    driver: Optional["Driver"] = Relationship(
+        back_populates="deliveries",
+        sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+class Driver(SQLModel, table=True):
+    __tablename__ = "driver"
+
+    id: UUID = Field(
+        default_factory=uuid4,
+        sa_column=Column(PostgreSQL.UUID, primary_key=True, default=uuid4)
+    )
+    name: str
+    email: EmailStr
+    hashed_password: str
+    phone_number: str
+    vehicle_number: str
+    is_available: bool = Field(default=True)
+
+    deliveries: List["Order"] = Relationship(
+        back_populates="driver",
         sa_relationship_kwargs={"lazy": "selectin"}
     )

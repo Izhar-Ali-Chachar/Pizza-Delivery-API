@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from .routers.auth_router import auth_router
 from .routers.order_router import order_router
+from .routers.deliveries import delivery_router
 
 @asynccontextmanager
 async def lifespan_handler(app: FastAPI):
@@ -15,3 +16,4 @@ app = FastAPI(lifespan=lifespan_handler)
 
 app.include_router(router=auth_router)
 app.include_router(router=order_router)
+app.include_router(router=delivery_router)
