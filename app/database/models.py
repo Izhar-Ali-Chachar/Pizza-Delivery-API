@@ -9,6 +9,11 @@ from uuid import UUID, uuid4
 
 from typing import List, Optional
 
+class UserRole(str, Enum):
+    USER = "user"
+    DRIVER = "driver"
+    ADMIN = "admin"
+
 class User(SQLModel, table=True):
     __tablename__ = "user"
 
@@ -19,6 +24,7 @@ class User(SQLModel, table=True):
     name: str
     email: EmailStr
     hashed_password: str
+    role: UserRole = Field(default=UserRole.USER)
 
     orders: List["Order"] = Relationship(
         back_populates="user",
