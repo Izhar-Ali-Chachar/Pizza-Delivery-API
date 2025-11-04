@@ -6,7 +6,7 @@ from uuid import UUID
 
 from ..schemas.order import OrderCreate, OrderRead, OrderUpdate
 
-from ..dependencies import sessionDep, currentUserDep, adminDep, userDep
+from ..dependencies import sessionDep, currentUserDep
 from ..database.models import Order
 
 order_router = APIRouter(
@@ -15,7 +15,7 @@ order_router = APIRouter(
 )
 
 @order_router.get("/", response_model=list[OrderRead])
-async def get_orders(session: sessionDep, current_user: adminDep):
+async def get_orders(session: sessionDep, current_user: currentUserDep):
     """
     Get all orders (admin use)
     """
@@ -38,7 +38,7 @@ async def get_order_by_id(id: UUID, session: sessionDep):
     return order
 
 @order_router.post("/create", response_model=OrderRead)
-async def create_order(order: OrderCreate, session: sessionDep, current_user: userDep):
+async def create_order(order: OrderCreate, session: sessionDep, current_user: currentUserDep):
     db_order = Order(
         **order.model_dump(), 
         user_id=current_user.id,
@@ -70,7 +70,7 @@ async def update_order_status(id: UUID, order: OrderUpdate, session: sessionDep)
     return db_order
 
 @order_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_order(id: UUID, session: sessionDep, current_user: adminDep):
+async def delete_order(id: UUID, session: sessionDep, current_user: currentUserDep):
     """
     Delete order by ID (admin use)
     """
